@@ -1,5 +1,5 @@
 const express = require('express');
-
+const db = require('./database');
 const app = express();
 const PORT = 3000;
 
@@ -10,7 +10,38 @@ app.get('/', (req, res) => {
         mensagem: 'API do Sistema de Gestão de Vendas Online funcionando!'
     });
 });
+app.post('/clientes', (req, res) => {
+    const { nome, email, telefone } = req.body;
 
+    if (!nome || !email) {
+        return res.status(400).json({
+            erro: 'Nome e e-mail são obrigatórios.'
+        });
+    }
+
+    const sql = `
+        INSERT INTO clientes (nome, email, telefone)
+        VALUES (?, ?, ?)
+    `;
+
+    db.run(sql, [nome, email, telefone], function (erro) {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao cadastrar cliente.'
+            });
+        }
+
+        res.status(201).json({
+            mensagem: 'Cliente cadastrado com sucesso!',
+            cliente: {
+                id: this.lastID,
+                nome,
+                email,
+                telefone
+            }
+        });
+    });
+});
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
