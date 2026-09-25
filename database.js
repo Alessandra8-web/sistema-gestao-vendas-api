@@ -26,4 +26,18 @@ db.run(`
         estoque INTEGER NOT NULL
     )
 `);
+db.run(`
+    CREATE TABLE IF NOT EXISTS pedidos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cliente_id INTEGER NOT NULL,
+        produto_id INTEGER NOT NULL,
+        quantidade INTEGER NOT NULL,
+        valor_total REAL NOT NULL,
+        forma_pagamento TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'Pendente',
+        data_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+        FOREIGN KEY (produto_id) REFERENCES produtos(id)
+    )
+`);
 module.exports = db;

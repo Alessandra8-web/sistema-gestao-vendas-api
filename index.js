@@ -104,6 +104,90 @@ app.get('/produtos', (req, res) => {
         res.json(produtos);
     });
 });
+// Cadastrar um novo pedido
+app.post('/pedidos', (req, res) => {
+    const { cliente_id, produto_id, quantidade, forma_pagamento } = req.body;
+
+    // Buscar o produto para calcular o valor total
+    db.get(
+        `SELECT * FROM produtos WHERE id = ?`,
+        [produto_id],
+        (erro, produto) => {
+            if (erro) {
+                return res.status(500).json({
+                    erro: 'Erro ao buscar produto.'
+                });
+            }
+
+            if (!produto) {
+                return res.status(404).json({
+                    erro: 'Produto não encontrado.'
+                });
+            }
+
+            const valor_total = produto.preco * quantidade;
+
+            const sql = `
+                INSERT INTO pedidos
+                (cliente_id, produto_id, quantidade, valor_total, forma_pagamento)
+                VALUES (?, ?, ?, ?, ?)
+            `;
+
+            db.run(
+                sql,
+                [cliente_id, produto_id, quantidade, valor_total, forma_pagamento],
+                function (erro) {
+                    if (erro) {
+                        return res.status(500).json({
+                            erro: 'Erro ao cadastrar pedido.'
+                        });
+                    }
+
+                    res.status(201).json({
+                        mensagem: 'Pedido cadastrado com sucesso!',
+                        pedido: {
+                            id: this.lastID,
+                            cliente_id,
+                            produto_id,
+                            quantidade,
+                            valor_total,
+                            forma_pagamento,
+                            status: 'Pendente'
+                        }
+                    });
+                }
+            );
+        }
+    );
+});
+// Listar todos os pedidos
+app.get('/pedidos', (req, res) => {
+    const sql = `
+        SELECT
+            pedidos.id,
+            clientes.nome AS cliente,
+            produtos.nome AS produto,
+            pedidos.quantidade,
+            pedidos.valor_total,
+            pedidos.forma_pagamento,
+            pedidos.status,
+            pedidos.data_pedido
+        FROM pedidos
+        INNER JOIN clientes ON clientes.id = pedidos.cliente_id
+        INNER JOIN produtos ON produtos.id = pedidos.produto_id
+        ORDER BY pedidos.id DESC
+    `;
+
+    db.all(sql, [], (erro, pedidos) => {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao listar pedidos.'
+            });
+        }
+
+        res.json(pedidos);
+    });
+});
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
