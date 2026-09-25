@@ -218,6 +218,26 @@ app.put('/pedidos/:id/pagamento', (req, res) => {
         });
     });
 });
+// Relatório geral de vendas
+app.get('/relatorios/vendas', (req, res) => {
+    const sql = `
+        SELECT
+            COUNT(*) AS total_pedidos,
+            SUM(CASE WHEN status = 'Confirmado' THEN 1 ELSE 0 END) AS vendas_confirmadas,
+            SUM(CASE WHEN status = 'Confirmado' THEN valor_total ELSE 0 END) AS faturamento_total
+        FROM pedidos
+    `;
+
+    db.get(sql, [], (erro, relatorio) => {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao gerar relatório de vendas.'
+            });
+        }
+
+        res.json(relatorio);
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
