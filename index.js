@@ -56,6 +56,54 @@ app.get('/clientes', (req, res) => {
         res.json(clientes);
     });
 });
+// Cadastrar produto
+app.post('/produtos', (req, res) => {
+    const { nome, descricao, preco, estoque } = req.body;
+
+    if (!nome || preco === undefined || estoque === undefined) {
+        return res.status(400).json({
+            erro: 'Nome, preço e estoque são obrigatórios.'
+        });
+    }
+
+    const sql = `
+        INSERT INTO produtos (nome, descricao, preco, estoque)
+        VALUES (?, ?, ?, ?)
+    `;
+
+    db.run(sql, [nome, descricao, preco, estoque], function (erro) {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao cadastrar produto.'
+            });
+        }
+
+        res.status(201).json({
+            mensagem: 'Produto cadastrado com sucesso!',
+            produto: {
+                id: this.lastID,
+                nome,
+                descricao,
+                preco,
+                estoque
+            }
+        });
+    });
+});
+// Listar todos os produtos
+app.get('/produtos', (req, res) => {
+    const sql = `SELECT * FROM produtos`;
+
+    db.all(sql, [], (erro, produtos) => {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao listar produtos.'
+            });
+        }
+
+        res.json(produtos);
+    });
+});
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

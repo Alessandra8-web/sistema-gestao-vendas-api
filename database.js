@@ -9,6 +9,7 @@ const db = new sqlite3.Database('./vendas.db', (erro) => {
 });
 
 db.run(`
+    
     CREATE TABLE IF NOT EXISTS clientes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
@@ -16,5 +17,13 @@ db.run(`
         telefone TEXT
     )
 `);
-
+db.run(`
+    CREATE TABLE IF NOT EXISTS produtos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        descricao TEXT,
+        preco REAL NOT NULL,
+        estoque INTEGER NOT NULL
+    )
+`);
 module.exports = db;
