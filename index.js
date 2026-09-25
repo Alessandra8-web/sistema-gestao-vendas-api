@@ -188,6 +188,37 @@ app.get('/pedidos', (req, res) => {
         res.json(pedidos);
     });
 });
+// Confirmar pagamento de um pedido
+app.put('/pedidos/:id/pagamento', (req, res) => {
+    const id = req.params.id;
+
+    const sql = `
+        UPDATE pedidos
+        SET status = 'Confirmado'
+        WHERE id = ?
+    `;
+
+    db.run(sql, [id], function (erro) {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao confirmar pagamento.'
+            });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({
+                erro: 'Pedido não encontrado.'
+            });
+        }
+
+        res.json({
+            mensagem: 'Pagamento confirmado com sucesso!',
+            pedido_id: id,
+            status: 'Confirmado'
+        });
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
