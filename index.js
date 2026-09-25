@@ -42,6 +42,20 @@ app.post('/clientes', (req, res) => {
         });
     });
 });
+// Listar todos os clientes
+app.get('/clientes', (req, res) => {
+    const sql = `SELECT * FROM clientes`;
+
+    db.all(sql, [], (erro, clientes) => {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao listar clientes.'
+            });
+        }
+
+        res.json(clientes);
+    });
+});
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
