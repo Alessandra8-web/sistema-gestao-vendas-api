@@ -238,6 +238,41 @@ app.get('/relatorios/vendas', (req, res) => {
         res.json(relatorio);
     });
 });
+// Relatório de vendas por período
+app.get('/relatorios/vendas/periodo', (req, res) => {
+    const { inicio, fim } = req.query;
+
+    if (!inicio || !fim) {
+        return res.status(400).json({
+            erro: 'Informe as datas de início e fim.'
+        });
+    }
+
+    const sql = `
+        SELECT
+            COUNT(*) AS total_pedidos,
+            SUM(CASE WHEN status = 'Confirmado' THEN 1 ELSE 0 END) AS vendas_confirmadas,
+            SUM(CASE WHEN status = 'Confirmado' THEN valor_total ELSE 0 END) AS faturamento_total
+        FROM pedidos
+        WHERE DATE(data_pedido) BETWEEN DATE(?) AND DATE(?)
+    `;
+
+    db.get(sql, [inicio, fim], (erro, relatorio) => {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao gerar relatório por período.'
+            });
+        }
+
+        res.json({
+            periodo: {
+                inicio: inicio,
+                fim: fim
+            },
+            ...relatorio
+        });
+    });
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
