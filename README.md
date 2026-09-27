@@ -18,7 +18,7 @@ Projeto Back-End desenvolvido para o Sistema de Gestão de Vendas Online, voltad
 
 Foi criada uma API integrada ao Sistema de Gestão de Vendas Online, com versionamento utilizando Git e integração com repositório remoto no GitHub.
 
-Na primeira Sprint foram desenvolvidas tarefas relacionadas à API e à interface do sistema, incluindo cadastro e listagem de clientes e produtos, registro de pedidos, confirmação de pagamento e geração de relatórios de vendas.
+Foram desenvolvidas tarefas relacionadas à API e à interface do sistema, incluindo cadastro e listagem de clientes e produtos, registro de pedidos, confirmação de pagamento e geração de relatórios de vendas.
 
 Foram implementadas no mínimo 8 tarefas da API e 8 tarefas da UI, conforme planejamento realizado no Trello.
 
